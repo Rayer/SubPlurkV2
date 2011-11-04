@@ -1,13 +1,21 @@
 package com.rayer.SubPlurkV2;
 
-import net.oauth.OAuthAccessor;
-import net.oauth.OAuthConsumer;
-import net.oauth.OAuthServiceProvider;
+import oauth.signpost.OAuthProvider;
+import oauth.signpost.basic.DefaultOAuthProvider;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthNotAuthorizedException;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,23 +23,15 @@ import android.widget.Button;
 public class SubPlurkV2Activity extends Activity {
 	
 	Button mBtn;
-	//static OAuthServiceProvider mOAuth;
-	static OAuthServiceProvider defaultProvider() {
-		
-		return new OAuthServiceProvider("http://www.plurk.com/OAuth/request_token", "http://www.plurk.com/m/authorize", "http://www.plurk.com/OAuth/access_token");
-	}
+	static final String PLURK_REQUEST_URL = "http://www.plurk.com/OAuth/request_token";
+	static final String PLURK_AUTHORIZATION_URL = "http://www.plurk.com/m/authorize";
+	static final String PLURK_ACCESS_URL = "http://www.plurk.com/OAuth/access_token";
+	static final String PLURK_CALLBACK_URL = "subplurkv2:///";
 	
-	public OAuthAccessor defaultAccessor() {
-	    String callbackUrl = "icecondor-android-app:///";
-	    OAuthServiceProvider provider =  defaultProvider();
-	    OAuthConsumer consumer = new OAuthConsumer(callbackUrl, 
-	                            "I1yKmAKMGkfJ",
-	                            "ZliRvOGEXmdgSDP7utOMbSvUZ4CV8CPa", 
-	                            provider);
-	    OAuthAccessor accessor = new OAuthAccessor(consumer);
-	    return accessor;
-	}
+	static final String PLURK_CONSUMER_KEY = "I1yKmAKMGkfJ";
+	static final String PLURK_CONSUMER_SECRET = "ZliRvOGEXmdgSDP7utOMbSvUZ4CV8CPa";
 	
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,51 +42,42 @@ public class SubPlurkV2Activity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				processButtonPushed();
+				try {
+					processButtonPushed();
+				} catch (OAuthMessageSignerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthNotAuthorizedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthExpectationFailedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthCommunicationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}});
         
     }
     
-    protected void processButtonPushed() {
-    	
-//    	DefaultHttpClient client = new DefaultHttpClient();
-//    	HttpPost post = new HttpPost("http://www.plurk.com/OAuth/request_token");
-//    	//HttpEntity entity = new HttpEntity();
-//    	
-//    	/*要塞這堆東西進去
-//    	 	oauth_consumer_key
-//			oauth_nonce
-//			oauth_signature_method
-//			oauth_signature
-//			oauth_timestamp
-//			oauth_version
-//			oauth_callback
-//    	 */
-//    	HttpEntity entity;
-//    	ArrayList<NameValuePair> nvp = new ArrayList<NameValuePair>();
-//    	nvp.add(new BasicNameValuePair("oauth_consumer_key", "I1yKmAKMGkfJ"));
-//    	nvp.add(new BasicNameValuePair("oauth_nonce", ""));
-//    	nvp.add(new BasicNameValuePair("oauth_signature_method", "HMAC-SHA1"));
-//    	nvp.add(new BasicNameValuePair("oauth_signature", ""));
-//    	nvp.add(new BasicNameValuePair("oauth_timestamp", "" + System.currentTimeMillis()));
-//    	nvp.add(new BasicNameValuePair("oauth_version", "1.0"));
-//    	nvp.add(new BasicNameValuePair("oauth_callback", ""));
-//    	try {
-//			entity = new UrlEncodedFormEntity(nvp);
-//		} catch (UnsupportedEncodingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-// 
-    	
-    	OAuthAccessor client = defaultAccessor();
-    	Intent intent = new Intent(Intent.ACTION_VIEW);
-    	intent.setData(
-    	      Uri.parse(
-    	           client.consumer.serviceProvider.userAuthorizationURL+
-    	           "?oauth_token="+client.requestToken+
-    	           "&oauth_callback="+client.consumer.callbackURL));
-    	startActivity(intent);
+	protected void processButtonPushed() throws OAuthMessageSignerException, OAuthNotAuthorizedException, OAuthExpectationFailedException, OAuthCommunicationException {
+		CommonsHttpOAuthConsumer consumer = new CommonsHttpOAuthConsumer(  
+				PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET);  
+		  
+		OAuthProvider provider = new DefaultOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);
+		
+		String url = provider.retrieveRequestToken(consumer, PLURK_CALLBACK_URL);
+		Log.d("SubPlurkV2", "url : " + url);
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(url));
+		startActivity(i);
+		
+		
+		//HttpClient client = new DefaultHttpClient();  
 
-    }
+	}
+
+    
+
 }
