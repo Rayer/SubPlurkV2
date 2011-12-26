@@ -1,5 +1,7 @@
 package com.rayer.SubPlurkV2.manager;
 
+import android.content.Context;
+
 public class SystemManager {
 	
 	private static SystemManager defInst = null;
@@ -12,13 +14,14 @@ public class SystemManager {
 		return defInst;
 	}
 	
-	public void init() {
-		authManager = new AuthManager();
+	public void init(Context context) {
+		plurkController = new PlurkController(context);
 	}
 	
-	AuthManager authManager;
-	public AuthManager getAuthManager() {
-		return authManager;
+	PlurkController plurkController;
+	
+	public PlurkController getPlurkCtrl() {
+		return plurkController;
 	}
 
 }

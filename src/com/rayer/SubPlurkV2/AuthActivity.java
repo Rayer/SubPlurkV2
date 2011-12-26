@@ -59,7 +59,7 @@ public class AuthActivity extends Activity {
 				Uri url = Uri.parse(urlString);
 				String verifier = url.getQueryParameter("oauth_verifier");
 				try {
-					SystemManager.getInst().getAuthManager().aquireAccessToken(verifier);
+					SystemManager.getInst().getPlurkCtrl().aquireAccessToken(verifier);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
