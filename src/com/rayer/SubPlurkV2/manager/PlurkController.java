@@ -197,10 +197,43 @@ PlurkTop
 	
 	//Profile
 	public JSONObject getOwnProfileRaw() {
-		return null;
+		try {
+			URI url = new URI(PLURK_BASE_URL + "/APP/Profile/getOwnProfile");
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost(url);
+			mainConsumer.sign(post);
+			HttpResponse res = client.execute(post);
+			String context = StreamUtil.InputStreamToString(res.getEntity().getContent());
+			
+			Log.d("SubPlurkV2", "" + context);
+			return new JSONObject(context);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (ProtocolException e) {
+			e.printStackTrace();
+		} catch (OAuthMessageSignerException e) {
+			e.printStackTrace();
+		} catch (OAuthExpectationFailedException e) {
+			e.printStackTrace();
+		} catch (OAuthCommunicationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return null;	
 	}
+	
 	public UserData getOwnProfile() {
-		
+		try {
+			return new UserData(getOwnProfileRaw().getJSONObject("user_info"));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
@@ -223,7 +256,6 @@ PlurkTop
 	
 	public JSONObject getPlurksRaw() {
 		try {
-			//URL url = new URL(PLURK_BASE_URL + "/APP/Timeline/getPlurks"); 
 			URI url = new URI(PLURK_BASE_URL + "/APP/Timeline/getPlurks");
 			HttpClient client = new DefaultHttpClient();
 			HttpPost post = new HttpPost(url);
@@ -231,38 +263,23 @@ PlurkTop
 			HttpResponse res = client.execute(post);
 			String context = StreamUtil.InputStreamToString(res.getEntity().getContent());
 			
-			
-//			HttpURLConnection request = (HttpURLConnection) url.openConnection();  
-//			request.setDoOutput(true);  
-//			request.setRequestMethod("POST");
-//			mainConsumer.sign(request);
-//			request.connect();
-//			String context = StreamUtil.InputStreamToString(request.getInputStream());
 			Log.d("SubPlurkV2", "" + context);
 			return new JSONObject(context);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OAuthMessageSignerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OAuthExpectationFailedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (OAuthCommunicationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;

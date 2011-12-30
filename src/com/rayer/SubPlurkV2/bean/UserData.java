@@ -1,7 +1,8 @@
 package com.rayer.SubPlurkV2.bean;
 
-import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.util.Log;
 
 import com.rayer.util.databridge.JSONConverter;
 
@@ -23,10 +24,12 @@ relationship: Can be not_saying, single, married, divorced, engaged, in_relation
 
  */
 public class UserData {
-	UserData(JSONObject jsobj) {
+	public UserData(JSONObject jsobj) {
+		//Log.d("SubPlurkV2", "UserData = " + jsobj.toString());
 		JSONConverter.extractFromJSON(UserData.class, this, jsobj);
 	}
 	
+	public int uid;
 	public String nick_name;
 	public String display_name;
 	public int has_profile_image;
@@ -40,4 +43,39 @@ public class UserData {
 	public float karma;
 	public int recuited;
 	public String relationship;
+
+	
+	/**
+	 * placeholder, will use more flexible method
+	 * @return
+	 */
+	public String createAvatarUrlBig() {
+		if(has_profile_image == 0)
+			return "http://www.plurk.com/static/default_big.gif";
+		
+		if(avatar == -1 || avatar == 0)
+			return "http://avatars.plurk.com/" + uid + "-big.jpg";
+		
+		return "http://avatars.plurk.com/" + uid + "-big" + avatar + ".jpg";
+	}
+	
+	public String createAvatarUrlMedium() {
+		if(has_profile_image == 0)
+			return "http://www.plurk.com/static/default_medium.gif";
+		
+		if(avatar == -1 || avatar == 0)
+			return "http://avatars.plurk.com/" + uid + "-medium.gif";
+		
+		return "http://avatars.plurk.com/" + uid + "-medium" + avatar + ".gif";
+	}
+	
+	public String createAvatarUrlSmall() {
+		if(has_profile_image == 0)
+			return "http://www.plurk.com/static/default_small.gif";
+		
+		if(avatar <= 0)
+			return "http://avatars.plurk.com/" + uid + "-small.gif";
+		
+		return "http://avatars.plurk.com/" + uid + "-small" + avatar + ".gif";
+	}
 }
