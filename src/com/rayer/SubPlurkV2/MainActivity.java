@@ -78,9 +78,6 @@ public class MainActivity extends FragmentActivity {
 		fragmentList.add(new FragmentData(EntirePlurkFragment.class, "時間軸"));
 		fragmentList.add(new FragmentData(UnreadFragment.class, "未讀/新出現"));
 		fragmentList.add(new FragmentData(TrackingFragment.class, "追蹤"));
-
-		
-
 	}
 	
 
@@ -102,10 +99,24 @@ public class MainActivity extends FragmentActivity {
 
 		@Override
 		public int getCount() {
-			// TODO Auto-generated method stub
 			return fragmentList.size();
 		}
 		
+	}
+
+
+	//TODO 這是一個很奇怪的問題，如果不這樣做，會產生null pointer exception錯誤 @@a
+	/* (non-Javadoc)
+	 * @see android.support.v4.app.FragmentActivity#onSaveInstanceState(android.os.Bundle)
+	 */
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		try {
+			super.onSaveInstanceState(outState);
+		}
+		catch(RuntimeException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

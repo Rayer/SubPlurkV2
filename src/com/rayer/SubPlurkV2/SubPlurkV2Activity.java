@@ -1,7 +1,5 @@
 package com.rayer.SubPlurkV2;
 
-import org.json.JSONObject;
-
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
@@ -15,7 +13,6 @@ import android.widget.Button;
 
 import com.rayer.SubPlurkV2.manager.PlurkController;
 import com.rayer.SubPlurkV2.manager.SystemManager;
-import com.rayer.util.string.StringUtil;
 
 public class SubPlurkV2Activity extends Activity {
 	
