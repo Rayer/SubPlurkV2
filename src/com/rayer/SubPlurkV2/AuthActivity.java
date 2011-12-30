@@ -1,8 +1,5 @@
 package com.rayer.SubPlurkV2;
 
-import java.net.URI;
-import java.net.URL;
-
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.net.Uri;

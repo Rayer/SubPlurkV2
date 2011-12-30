@@ -39,7 +39,9 @@ public class SubPlurkV2Activity extends Activity {
     }
     
 	protected void processButtonPushed() {
-		if(mPC.isLoggedIn() == false)
+		if(mPC.isLoggedIn() == true)
+			mPC.getPlurksRaw();
+		else
 			try {
 				mPC.attemptAuth();
 			} catch (OAuthMessageSignerException e) {
@@ -55,8 +57,7 @@ public class SubPlurkV2Activity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		else
-			mPC.getPlurks();
+
 	}
 
     

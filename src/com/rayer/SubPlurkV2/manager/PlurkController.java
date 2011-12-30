@@ -4,17 +4,23 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
-import oauth.signpost.basic.DefaultOAuthConsumer;
-import oauth.signpost.basic.DefaultOAuthProvider;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,8 +58,8 @@ public class PlurkController {
 	Context context;
 	SharedPreferences sp;
 	PlurkController(Context inContext) {
-		mainConsumer = new DefaultOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET); 
-		mainProvider = new DefaultOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);
+		mainConsumer = new CommonsHttpOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET); 
+		mainProvider = new CommonsHttpOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);
 		context = inContext;
 		sp = inContext.getSharedPreferences(PLURK_ROOT_PREF, Context.MODE_PRIVATE);
 		
@@ -198,13 +204,21 @@ PlurkTop
 	
 	public JSONObject getPlurksRaw() {
 		try {
-			URL url = new URL(PLURK_BASE_URL + "/APP/Timeline/getPlurks");  
-			HttpURLConnection request = (HttpURLConnection) url.openConnection();  
-			request.setDoOutput(true);  
-			request.setRequestMethod("POST");
-			mainConsumer.sign(request);
-			request.connect();
-			String context = StreamUtil.InputStreamToString(request.getInputStream());
+			//URL url = new URL(PLURK_BASE_URL + "/APP/Timeline/getPlurks"); 
+			URI url = new URI(PLURK_BASE_URL + "/APP/Timeline/getPlurks");
+			HttpClient client = new DefaultHttpClient();
+			HttpPost post = new HttpPost(url);
+			mainConsumer.sign(post);
+			HttpResponse res = client.execute(post);
+			String context = StreamUtil.InputStreamToString(res.getEntity().getContent());
+			
+			
+//			HttpURLConnection request = (HttpURLConnection) url.openConnection();  
+//			request.setDoOutput(true);  
+//			request.setRequestMethod("POST");
+//			mainConsumer.sign(request);
+//			request.connect();
+//			String context = StreamUtil.InputStreamToString(request.getInputStream());
 			Log.d("SubPlurkV2", "" + context);
 			return new JSONObject(context);
 		} catch (MalformedURLException e) {
@@ -226,6 +240,9 @@ PlurkTop
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
