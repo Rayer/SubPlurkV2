@@ -7,7 +7,6 @@ public class PlurkScrapView extends RelativeLayout {
 
 	public PlurkScrapView(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 }

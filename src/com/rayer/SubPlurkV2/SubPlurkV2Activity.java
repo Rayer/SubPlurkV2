@@ -1,10 +1,13 @@
 package com.rayer.SubPlurkV2;
 
+import org.json.JSONObject;
+
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,6 +15,7 @@ import android.widget.Button;
 
 import com.rayer.SubPlurkV2.manager.PlurkController;
 import com.rayer.SubPlurkV2.manager.SystemManager;
+import com.rayer.util.string.StringUtil;
 
 public class SubPlurkV2Activity extends Activity {
 	
@@ -27,39 +31,50 @@ public class SubPlurkV2Activity extends Activity {
         
         mBtn = (Button) findViewById(R.id.auth_button);
         mPC = SystemManager.getInst().getPlurkCtrl();
+
+ 
+    }
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
+	@Override
+	protected void onResume() {
+        
         boolean isLoggin = mPC.isLoggedIn();
-        mBtn.setText(isLoggin ? "Get Timeline" : "Login");
+
+        if(isLoggin == true) {
+        	//experimental
+        	//JSONObject obj = mPC.getPlurksRaw();
+        	//StringUtil.stringToFile("/sdcard/sample.txt", obj.toString());
+        	
+        	Intent i = new Intent();
+        	i.setClass(this, MainActivity.class);
+        	i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        	startActivity(i);
+        	finish();
+        }
+        
         mBtn.setOnClickListener(new OnClickListener(){
 
 			@Override
-			public void onClick(View v) {
-				processButtonPushed();
-
-			}});
-    }
-    
-	protected void processButtonPushed() {
-		if(mPC.isLoggedIn() == true)
-			mPC.getPlurksRaw();
-		else
-			try {
-				mPC.attemptAuth();
-			} catch (OAuthMessageSignerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (OAuthNotAuthorizedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (OAuthExpectationFailedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (OAuthCommunicationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+			public void onClick(View arg0) {
+				try {
+					mPC.attemptAuth();
+				} catch (OAuthMessageSignerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthNotAuthorizedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthExpectationFailedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OAuthCommunicationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}});		
+        super.onResume();
 	}
-
     
-
 }

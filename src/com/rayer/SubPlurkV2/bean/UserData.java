@@ -1,6 +1,9 @@
 package com.rayer.SubPlurkV2.bean;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.rayer.util.databridge.JSONConverter;
 
 /*
  * id: The unique user id.
@@ -21,7 +24,7 @@ relationship: Can be not_saying, single, married, divorced, engaged, in_relation
  */
 public class UserData {
 	UserData(JSONObject jsobj) {
-		
+		JSONConverter.extractFromJSON(UserData.class, this, jsobj);
 	}
 	
 	public String nick_name;

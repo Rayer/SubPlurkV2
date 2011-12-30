@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class UserDataFragment extends Fragment {
+public class TrackingFragment extends Fragment {
 
 	/* (non-Javadoc)
 	 * @see android.support.v4.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
@@ -16,8 +16,7 @@ public class UserDataFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		TextView tv = new TextView(container.getContext());
-		tv.setText("This is LoginFragment");
-
+		tv.setText("This is TrackingFragment");
 		
 		return tv;
 	}

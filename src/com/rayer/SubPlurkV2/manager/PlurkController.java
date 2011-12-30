@@ -7,6 +7,8 @@ import java.net.ProtocolException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
@@ -21,6 +23,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +34,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.rayer.SubPlurkV2.AuthActivity;
+import com.rayer.SubPlurkV2.bean.PlurkScrap;
 import com.rayer.SubPlurkV2.bean.UserData;
 import com.rayer.util.stream.StreamUtil;
 
@@ -201,6 +205,21 @@ PlurkTop
 	}
 	
 	//Timeline
+	
+	public List<PlurkScrap> getPlurks() {
+		ArrayList<PlurkScrap> ret = new ArrayList<PlurkScrap>();
+		JSONObject raw = getPlurksRaw();
+		try {
+			JSONArray array = raw.getJSONArray("plurks");
+			for(int i = 0; i < array.length(); ++i) 
+				ret.add(new PlurkScrap((JSONObject)array.get(i)));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
 	
 	public JSONObject getPlurksRaw() {
 		try {

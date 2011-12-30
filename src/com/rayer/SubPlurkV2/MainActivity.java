@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 
+import com.rayer.SubPlurkV2.fragments.EntirePlurkFragment;
+import com.rayer.SubPlurkV2.fragments.TrackingFragment;
 import com.rayer.SubPlurkV2.fragments.UnreadFragment;
 import com.rayer.SubPlurkV2.fragments.UserDataFragment;
 import com.rayer.SubPlurkV2.manager.SystemManager;
@@ -73,9 +75,9 @@ public class MainActivity extends FragmentActivity {
 	private void setupExperiments() {
 		fragmentList = new ArrayList<FragmentData>();
 		fragmentList.add(new FragmentData(UserDataFragment.class, "使用者資料"));
-		fragmentList.add(new FragmentData(UnreadFragment.class, "時間軸"));
+		fragmentList.add(new FragmentData(EntirePlurkFragment.class, "時間軸"));
 		fragmentList.add(new FragmentData(UnreadFragment.class, "未讀/新出現"));
-		fragmentList.add(new FragmentData(UnreadFragment.class, "追蹤"));
+		fragmentList.add(new FragmentData(TrackingFragment.class, "追蹤"));
 
 		
 
