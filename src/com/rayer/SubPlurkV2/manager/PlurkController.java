@@ -200,6 +200,7 @@ public class PlurkController {
 	}
 	
 	
+	//TODO 這邊其實有個問題，就是由於FSRP裡面存的只有uid, 所以事實上該uid改過avatar的話會無法更新. Anyway, 這個只要把FSRP裡面的indentificator改一下讓他也參考avatar的值（加起來取hash?）就可以，不過我在想想怎麼做...
 	public ResourceProxy<Bitmap, String> getAvatarProxy(final IAvatarFetchable obj, final AVATAR_SIZE size) {
 		ResourceProxy<Bitmap, String> ret = new ResourceProxy<Bitmap, String>(){
 
