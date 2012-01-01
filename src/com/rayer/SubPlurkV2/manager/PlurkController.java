@@ -1,11 +1,11 @@
 package com.rayer.SubPlurkV2.manager;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +19,6 @@ import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.exception.OAuthNotAuthorizedException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,12 +26,20 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.rayer.SubPlurkV2.AuthActivity;
+import com.rayer.SubPlurkV2.bean.IAvatarFetchable;
 import com.rayer.SubPlurkV2.bean.PlurkScrap;
 import com.rayer.SubPlurkV2.bean.UserData;
+import com.rayer.util.provisioner.FileSystemResourceProvisioner;
+import com.rayer.util.provisioner.InternetResourceProvisioner;
+import com.rayer.util.provisioner.MemoryCacheResourceProvisioner;
+import com.rayer.util.provisioner.ResourceProxy;
 import com.rayer.util.stream.StreamUtil;
 
 public class PlurkController {	
@@ -62,6 +66,7 @@ public class PlurkController {
 	Context context;
 	SharedPreferences sp;
 	PlurkController(Context inContext) {
+		initProvisioners();
 		mainConsumer = new CommonsHttpOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET); 
 		mainProvider = new CommonsHttpOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);
 		context = inContext;
@@ -73,6 +78,7 @@ public class PlurkController {
 		
 		if(accessToken.equals("") == false)
 			mainConsumer.setTokenWithSecret(accessToken, accessSecret);
+		
 	}
 	
 	public void setAccessToken(String token, String tokenSecret) {
@@ -106,6 +112,123 @@ public class PlurkController {
 		accessToken = "";
 		accessSecret = "";
 		sp.edit().putString(PLURK_AT_TOKEN_PREF, accessToken).putString(PLURK_AT_SECRET_PREF, accessSecret).commit();
+	}
+	
+	protected String createAvatarUrlBig(IAvatarFetchable obj) {
+		if(obj.hasProfileImage() == 0)
+			return "http://www.plurk.com/static/default_big.gif";
+		
+		if(obj.getAvatar() <= 0)
+			return "http://avatars.plurk.com/" + obj.getUID() + "-big.jpg";
+		
+		return "http://avatars.plurk.com/" + obj.getUID() + "-big" + obj.getAvatar() + ".jpg";
+	}
+	
+	protected String createAvatarUrlMedium(IAvatarFetchable obj) {
+		if(obj.hasProfileImage() == 0)
+			return "http://www.plurk.com/static/default_medium.gif";
+		
+		if(obj.getAvatar() <= 0)
+			return "http://avatars.plurk.com/" + obj.getUID() + "-medium.gif";
+		
+		return "http://avatars.plurk.com/" + obj.getUID() + "-medium" + obj.getAvatar() + ".gif";
+	}
+	
+	protected String createAvatarUrlSmall(IAvatarFetchable obj) {
+		if(obj.hasProfileImage() == 0)
+			return "http://www.plurk.com/static/default_small.gif";
+		
+		if(obj.getAvatar() <= 0)
+			return "http://avatars.plurk.com/" + obj.getUID() + "-small.gif";
+		
+		return "http://avatars.plurk.com/" + obj.getUID() + "-small" + obj.getAvatar() + ".gif";
+	}
+	
+	enum AVATAR_SIZE {
+		SMALL,
+		MEDIUM,
+		BIG
+	}
+	
+	//Cache的部分我還在想要怎麼寫....
+	ArrayList<MemoryCacheResourceProvisioner<Bitmap, String> > avatarMCRPArray;// = ((MemoryCacheResourceProvisioner<Bitmap, String>[]){null, null, null});
+	ArrayList<FileSystemResourceProvisioner<Bitmap, String> > avatarFSRPArray; //= {null, null, null};
+	
+	private void initProvisioners() {
+		avatarMCRPArray = new ArrayList<MemoryCacheResourceProvisioner<Bitmap, String> >();
+
+		String base_path = "/sdcard/.SubPlurkV2/cache/avatar";
+		String[] FileCachePath = {base_path + "small", base_path + "medium", base_path + "big"};
+		avatarFSRPArray = new ArrayList<FileSystemResourceProvisioner<Bitmap, String> >();
+		
+		for(int i = 0; i < AVATAR_SIZE.values().length; ++i) {
+			avatarMCRPArray.add(new MemoryCacheResourceProvisioner<Bitmap, String>(){
+
+				@Override
+				public boolean clearAllCachedResource() {
+					return false;
+				}
+
+				@Override
+				public boolean destroyElement(Bitmap source) {
+					source.recycle();
+					return true;
+				}});
+			
+			avatarFSRPArray.add(new FileSystemResourceProvisioner<Bitmap, String>(FileCachePath[i]){
+
+				@Override
+				public Bitmap formFromStream(InputStream in) {
+					return BitmapFactory.decodeStream(in);
+				}
+
+				@Override
+				public void writeToOutputStream(Bitmap target,
+						FileOutputStream fo) {
+					target.compress(CompressFormat.PNG, 75, fo);
+				}});
+		}
+			
+	};
+	
+	private MemoryCacheResourceProvisioner<Bitmap, String> getAvatarMCRP(AVATAR_SIZE size) {
+		return avatarMCRPArray.get(size.ordinal());
+	}
+	
+	private FileSystemResourceProvisioner<Bitmap, String> getAvatarFSRP(AVATAR_SIZE size) {
+		return avatarFSRPArray.get(size.ordinal());
+	}
+	
+	
+	public ResourceProxy<Bitmap, String> getAvatarProxy(final IAvatarFetchable obj, final AVATAR_SIZE size) {
+		ResourceProxy<Bitmap, String> ret = new ResourceProxy<Bitmap, String>(){
+
+			@Override
+			public String getIndentificator() {
+				return "" + obj.getUID();
+			}};
+			
+		ret.addProvisioner(getAvatarMCRP(size));
+		ret.addProvisioner(getAvatarFSRP(size));
+		ret.addProvisioner(new InternetResourceProvisioner<Bitmap, String>(){
+
+			@Override
+			public Bitmap formFromStream(InputStream is) {
+				return BitmapFactory.decodeStream(is);
+			}
+
+			@Override
+			public String getUrlAddress(String identificator) {
+				//先寫的ugly一點，我懶的全部opt了 orz
+				if(size == AVATAR_SIZE.BIG)
+					return createAvatarUrlBig(obj);
+				else if(size == AVATAR_SIZE.MEDIUM)
+					return createAvatarUrlMedium(obj);
+				
+				return createAvatarUrlSmall(obj);
+			}});
+		
+		return ret;
 	}
 
 	/**
@@ -197,34 +320,7 @@ PlurkTop
 	
 	//Profile
 	public JSONObject getOwnProfileRaw() {
-		try {
-			URI url = new URI(PLURK_BASE_URL + "/APP/Profile/getOwnProfile");
-			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(url);
-			mainConsumer.sign(post);
-			HttpResponse res = client.execute(post);
-			String context = StreamUtil.InputStreamToString(res.getEntity().getContent());
-			
-			Log.d("SubPlurkV2", "" + context);
-			return new JSONObject(context);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
-		} catch (OAuthMessageSignerException e) {
-			e.printStackTrace();
-		} catch (OAuthExpectationFailedException e) {
-			e.printStackTrace();
-		} catch (OAuthCommunicationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return null;	
+		return fetchData(PLURK_BASE_URL + "/APP/Profile/getOwnProfile");	
 	}
 	
 	public UserData getOwnProfile() {
@@ -255,34 +351,7 @@ PlurkTop
 	}
 	
 	public JSONObject getPlurksRaw() {
-		try {
-			URI url = new URI(PLURK_BASE_URL + "/APP/Timeline/getPlurks");
-			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost(url);
-			mainConsumer.sign(post);
-			HttpResponse res = client.execute(post);
-			String context = StreamUtil.InputStreamToString(res.getEntity().getContent());
-			
-			Log.d("SubPlurkV2", "" + context);
-			return new JSONObject(context);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
-		} catch (OAuthMessageSignerException e) {
-			e.printStackTrace();
-		} catch (OAuthExpectationFailedException e) {
-			e.printStackTrace();
-		} catch (OAuthCommunicationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return fetchData(PLURK_BASE_URL + "/APP/Timeline/getPlurks");
 	}
 	
 	//Real time notifications
@@ -295,8 +364,12 @@ PlurkTop
 	 *	You do requests to this unqiue channel in order to get notifications
 	 */
 	public JSONObject getUserChannel() {
+		return fetchData(PLURK_BASE_URL + "/APP/Realtime/getUserChannel");
+	}
+	
+	protected JSONObject fetchData(String targetURL) {
 		try {
-			URL url = new URL(PLURK_BASE_URL + "/APP/Realtime/getUserChannel");  
+			URL url = new URL(targetURL);  
 			HttpURLConnection request = (HttpURLConnection) url.openConnection();  
 			request.setDoOutput(true);  
 			request.setRequestMethod("POST");

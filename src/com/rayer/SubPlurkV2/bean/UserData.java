@@ -23,7 +23,7 @@ recruited: How many friends has the user recruited.
 relationship: Can be not_saying, single, married, divorced, engaged, in_relationship, complicated, widowed, unstable_relationship, open_relationship
 
  */
-public class UserData {
+public class UserData implements IAvatarFetchable {
 	public UserData(JSONObject jsobj) {
 		//Log.d("SubPlurkV2", "UserData = " + jsobj.toString());
 		JSONConverter.extractFromJSON(UserData.class, this, jsobj);
@@ -44,38 +44,16 @@ public class UserData {
 	public int recuited;
 	public String relationship;
 
-	
-	/**
-	 * placeholder, will use more flexible method
-	 * @return
-	 */
-	public String createAvatarUrlBig() {
-		if(has_profile_image == 0)
-			return "http://www.plurk.com/static/default_big.gif";
-		
-		if(avatar == -1 || avatar == 0)
-			return "http://avatars.plurk.com/" + uid + "-big.jpg";
-		
-		return "http://avatars.plurk.com/" + uid + "-big" + avatar + ".jpg";
+	public int hasProfileImage() {
+		return has_profile_image;
 	}
-	
-	public String createAvatarUrlMedium() {
-		if(has_profile_image == 0)
-			return "http://www.plurk.com/static/default_medium.gif";
-		
-		if(avatar == -1 || avatar == 0)
-			return "http://avatars.plurk.com/" + uid + "-medium.gif";
-		
-		return "http://avatars.plurk.com/" + uid + "-medium" + avatar + ".gif";
+	@Override
+	public int getUID() {
+		return uid;
 	}
-	
-	public String createAvatarUrlSmall() {
-		if(has_profile_image == 0)
-			return "http://www.plurk.com/static/default_small.gif";
-		
-		if(avatar <= 0)
-			return "http://avatars.plurk.com/" + uid + "-small.gif";
-		
-		return "http://avatars.plurk.com/" + uid + "-small" + avatar + ".gif";
+	@Override
+	public int getAvatar() {
+		return avatar;
 	}
+
 }
