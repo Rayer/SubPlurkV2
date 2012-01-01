@@ -1,0 +1,14 @@
+
+Dependency : 
+1. Jake Wharton's ActionBarSherlock : https://github.com/JakeWharton/ActionBarSherlock
+   For install guide, please refer to http://actionbarhserlock.com
+
+   This is the most famous ActionBar implementation, contributed by Jake Wharton, and I use it to replace Android Compibility Package.
+ 
+2. Jake Wharton's ViewPageIndicator : https://github.com/JakeWharton/Android-ViewPagerIndicator
+
+   Another masterpiece of this guy, I use it as view page flipper.
+
+3. Myself Utilities : https://github.com/Rayer/Utilities 
+
+   I suggest anyone to take a look into ResourceProxy and ResourceProvisioner, it is a pretty implement and may be useful for anyone.
