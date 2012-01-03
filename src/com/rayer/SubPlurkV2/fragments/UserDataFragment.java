@@ -1,6 +1,7 @@
 package com.rayer.SubPlurkV2.fragments;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,8 +15,9 @@ import android.widget.TextView;
 
 import com.rayer.SubPlurkV2.R;
 import com.rayer.SubPlurkV2.SubPlurkV2Activity;
-import com.rayer.SubPlurkV2.bean.UserData;
+import com.rayer.SubPlurkV2.bean.Profile;
 import com.rayer.SubPlurkV2.manager.PlurkController;
+import com.rayer.SubPlurkV2.manager.PlurkController.AVATAR_SIZE;
 import com.rayer.SubPlurkV2.manager.SystemManager;
 
 public class UserDataFragment extends Fragment {
@@ -33,7 +35,7 @@ public class UserDataFragment extends Fragment {
 		Button btn = (Button) ll.findViewById(R.id.logout);
 		
 		final PlurkController pc = SystemManager.getInst().getPlurkCtrl();
-		UserData data = pc.getOwnProfile();
+		Profile data = pc.getOwnProfile();
 		
 		tv.setText(data.nick_name);
 		
@@ -48,6 +50,9 @@ public class UserDataFragment extends Fragment {
 	        	startActivity(i);				
 				UserDataFragment.this.getActivity().finish();
 			}});
+		
+		Bitmap bmp = pc.getAvatarProxy(data, AVATAR_SIZE.MEDIUM).getResource(null);
+		iv.setImageBitmap(bmp);
 				
 		return ll;
 	}

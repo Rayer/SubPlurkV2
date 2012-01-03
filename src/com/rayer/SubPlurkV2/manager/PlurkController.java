@@ -12,8 +12,8 @@ import java.util.List;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
-import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
+import oauth.signpost.basic.DefaultOAuthConsumer;
+import oauth.signpost.basic.DefaultOAuthProvider;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
@@ -35,12 +35,13 @@ import android.util.Log;
 import com.rayer.SubPlurkV2.AuthActivity;
 import com.rayer.SubPlurkV2.bean.IAvatarFetchable;
 import com.rayer.SubPlurkV2.bean.PlurkScrap;
-import com.rayer.SubPlurkV2.bean.UserData;
+import com.rayer.SubPlurkV2.bean.Profile;
 import com.rayer.util.provisioner.FileSystemResourceProvisioner;
 import com.rayer.util.provisioner.InternetResourceProvisioner;
 import com.rayer.util.provisioner.MemoryCacheResourceProvisioner;
 import com.rayer.util.provisioner.ResourceProxy;
 import com.rayer.util.stream.StreamUtil;
+import com.rayer.util.string.StringUtil;
 
 public class PlurkController {	
 	
@@ -67,8 +68,10 @@ public class PlurkController {
 	SharedPreferences sp;
 	PlurkController(Context inContext) {
 		initProvisioners();
-		mainConsumer = new CommonsHttpOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET); 
-		mainProvider = new CommonsHttpOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);
+		//mainConsumer = new CommonsHttpOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET); 
+		//mainProvider = new CommonsHttpOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);
+		mainConsumer = new DefaultOAuthConsumer(PLURK_CONSUMER_KEY, PLURK_CONSUMER_SECRET);
+		mainProvider = new DefaultOAuthProvider(PLURK_REQUEST_URL, PLURK_ACCESS_URL, PLURK_AUTHORIZATION_URL);
 		context = inContext;
 		sp = inContext.getSharedPreferences(PLURK_ROOT_PREF, Context.MODE_PRIVATE);
 		
@@ -144,13 +147,15 @@ public class PlurkController {
 		return "http://avatars.plurk.com/" + obj.getUID() + "-small" + obj.getAvatar() + ".gif";
 	}
 	
-	enum AVATAR_SIZE {
+	public enum AVATAR_SIZE {
 		SMALL,
 		MEDIUM,
 		BIG
 	}
 	
 	//Cache的部分我還在想要怎麼寫....
+	//FSRP跟MCRP其實都可以濃縮成一個就好，我想想怎麼弄
+	
 	ArrayList<MemoryCacheResourceProvisioner<Bitmap, String> > avatarMCRPArray;// = ((MemoryCacheResourceProvisioner<Bitmap, String>[]){null, null, null});
 	ArrayList<FileSystemResourceProvisioner<Bitmap, String> > avatarFSRPArray; //= {null, null, null};
 	
@@ -171,6 +176,12 @@ public class PlurkController {
 
 				@Override
 				public boolean destroyElement(Bitmap source) {
+					
+					
+					if(source == null) // || source.isNotRecycleable())
+						return false;
+					
+					
 					source.recycle();
 					return true;
 				}});
@@ -324,9 +335,10 @@ PlurkTop
 		return fetchData(PLURK_BASE_URL + "/APP/Profile/getOwnProfile");	
 	}
 	
-	public UserData getOwnProfile() {
+	public Profile getOwnProfile() {
+
 		try {
-			return new UserData(getOwnProfileRaw().getJSONObject("user_info"));
+			return new Profile(getOwnProfileRaw().getJSONObject("user_info"));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -339,7 +351,16 @@ PlurkTop
 	public List<PlurkScrap> getPlurks() {
 		ArrayList<PlurkScrap> ret = new ArrayList<PlurkScrap>();
 		JSONObject raw = getPlurksRaw();
+		//StringUtil.stringToFile("/sdcard/plurks.txt", raw.toString());
+		
 		try {
+			JSONArray users = raw.getJSONArray("");
+			//process users
+			//1. fetch from local memory map
+			//2. fetch from database
+			//3. fetch from internet AND FORCE UPDATE
+			
+			//--end process users
 			JSONArray array = raw.getJSONArray("plurks");
 			for(int i = 0; i < array.length(); ++i) 
 				ret.add(new PlurkScrap((JSONObject)array.get(i)));
