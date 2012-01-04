@@ -41,7 +41,6 @@ import com.rayer.util.provisioner.InternetResourceProvisioner;
 import com.rayer.util.provisioner.MemoryCacheResourceProvisioner;
 import com.rayer.util.provisioner.ResourceProxy;
 import com.rayer.util.stream.StreamUtil;
-import com.rayer.util.string.StringUtil;
 
 public class PlurkController {	
 	
@@ -338,6 +337,7 @@ PlurkTop
 	public Profile getOwnProfile() {
 
 		try {
+			
 			return new Profile(getOwnProfileRaw().getJSONObject("user_info"));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -355,6 +355,7 @@ PlurkTop
 		
 		try {
 			JSONArray users = raw.getJSONArray("");
+			refreshUserListCache(users);
 			//process users
 			//1. fetch from local memory map
 			//2. fetch from database
@@ -372,6 +373,14 @@ PlurkTop
 		return ret;
 	}
 	
+	private void refreshUserListCache(JSONArray users) {
+		
+		for(int i = 0; i < users.length(); ++i) {
+			//int uuid = ((JSONObject)users.get(i)).getInt("uid");
+			
+		}
+	}
+
 	public JSONObject getPlurksRaw() {
 		return fetchData(PLURK_BASE_URL + "/APP/Timeline/getPlurks");
 	}
