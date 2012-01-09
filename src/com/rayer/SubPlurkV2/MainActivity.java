@@ -26,6 +26,16 @@ public class MainActivity extends FragmentActivity {
 		Class<? extends Fragment> frag;
 		String title;
 		FragmentData(Class<? extends Fragment> target, String inTitle) {
+			init(target, inTitle);
+		}
+		
+		FragmentData(Class<? extends Fragment> target, int inResource) {
+			String str = MainActivity.this.getResources().getString(inResource);
+			init(target, str);
+			
+		}
+		
+		private void init(Class<? extends Fragment> target, String inTitle) {
 			frag = target;
 			title = inTitle;
 		}
@@ -74,10 +84,10 @@ public class MainActivity extends FragmentActivity {
 	
 	private void setupExperiments() {
 		fragmentList = new ArrayList<FragmentData>();
-		fragmentList.add(new FragmentData(UserDataFragment.class, "使用者資料"));
-		fragmentList.add(new FragmentData(EntirePlurkFragment.class, "時間軸"));
-		fragmentList.add(new FragmentData(UnreadFragment.class, "未讀/新出現"));
-		fragmentList.add(new FragmentData(TrackingFragment.class, "追蹤"));
+		fragmentList.add(new FragmentData(UserDataFragment.class, R.string.user_profile));
+		fragmentList.add(new FragmentData(EntirePlurkFragment.class, R.string.timeline));
+		fragmentList.add(new FragmentData(UnreadFragment.class, R.string.unread_and_new));
+		fragmentList.add(new FragmentData(TrackingFragment.class, R.string.tracking));
 	}
 	
 

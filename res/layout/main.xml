@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/main_bg"
     android:orientation="vertical"
-    android:id="@+id/root" >
-    <TextView 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Welcome to SubPlurk, the most advanced plurk app in the world! It seems you haven't logged in yet, press button to login..."
-        android:id="@+id/welcome_text"/>    
+    android:padding="30dp" >
+
+    <TextView
+        android:id="@+id/welcome_text"
+        android:layout_width="240dp"
+        android:layout_height="180dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/paper_bg"
+        android:text="Welcome to SubPlurk, the most advanced plurk app in the world! It seems you haven&apos;t logged in yet, press button to login..."
+        android:textColor="#FF000000"
+        android:textSize="18sp"
+        android:padding="5dip" />
 
     <Button
+        android:id="@+id/auth_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/welcome_text"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button1_bg"
+        android:padding="5dip"
         android:text="Login!"
-        android:id="@+id/auth_button"
-        android:layout_below="@id/welcome_text" 
-        />
+        android:textSize="15sp" />
 
 </RelativeLayout>

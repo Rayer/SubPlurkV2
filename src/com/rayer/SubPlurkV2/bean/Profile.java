@@ -2,8 +2,6 @@ package com.rayer.SubPlurkV2.bean;
 
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.rayer.util.databridge.JSONConverter;
 
 /*

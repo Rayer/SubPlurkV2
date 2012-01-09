@@ -41,7 +41,6 @@ import com.rayer.util.provisioner.InternetResourceProvisioner;
 import com.rayer.util.provisioner.MemoryCacheResourceProvisioner;
 import com.rayer.util.provisioner.ResourceProxy;
 import com.rayer.util.stream.StreamUtil;
-import com.rayer.util.string.StringUtil;
 
 public class PlurkController {	
 	
@@ -354,7 +353,7 @@ PlurkTop
 		//StringUtil.stringToFile("/sdcard/plurks.txt", raw.toString());
 		
 		try {
-			JSONArray users = raw.getJSONArray("");
+			//JSONArray users = raw.getJSONArray("");
 			//process users
 			//1. fetch from local memory map
 			//2. fetch from database

@@ -3,5 +3,9 @@
 
     <string name="hello">Hello World, SubPlurkV2Activity!</string>
     <string name="app_name">SubPlurkV2</string>
+    <string name="user_profile">User Profile</string>
+    <string name="unread_and_new">Unread and New</string>
+    <string name="timeline">Timeline</string>
+    <string name="tracking">Tracking</string>
 
 </resources>
