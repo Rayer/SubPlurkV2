@@ -337,6 +337,7 @@ PlurkTop
 	public Profile getOwnProfile() {
 
 		try {
+			
 			return new Profile(getOwnProfileRaw().getJSONObject("user_info"));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -353,7 +354,12 @@ PlurkTop
 		//StringUtil.stringToFile("/sdcard/plurks.txt", raw.toString());
 		
 		try {
-			//JSONArray users = raw.getJSONArray("");
+//<<<<<<< HEAD
+//			//JSONArray users = raw.getJSONArray("");
+//=======
+//			JSONArray users = raw.getJSONArray("");
+//			refreshUserListCache(users);
+//>>>>>>> 8395e804a066f24b11c3dda8e18afcf99a2903ab
 			//process users
 			//1. fetch from local memory map
 			//2. fetch from database
@@ -371,6 +377,14 @@ PlurkTop
 		return ret;
 	}
 	
+	private void refreshUserListCache(JSONArray users) {
+		
+		for(int i = 0; i < users.length(); ++i) {
+			//int uuid = ((JSONObject)users.get(i)).getInt("uid");
+			
+		}
+	}
+
 	public JSONObject getPlurksRaw() {
 		return fetchData(PLURK_BASE_URL + "/APP/Timeline/getPlurks");
 	}

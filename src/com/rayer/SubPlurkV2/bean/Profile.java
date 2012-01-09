@@ -3,6 +3,7 @@ package com.rayer.SubPlurkV2.bean;
 import org.json.JSONObject;
 
 import com.rayer.util.databridge.JSONConverter;
+import com.rayer.util.string.StringUtil;
 
 /*
  * id: The unique user id.
@@ -21,37 +22,21 @@ recruited: How many friends has the user recruited.
 relationship: Can be not_saying, single, married, divorced, engaged, in_relationship, complicated, widowed, unstable_relationship, open_relationship
 
  */
-public class Profile implements IAvatarFetchable {
+public class Profile extends BasicUserData {
 	public Profile(JSONObject jsobj) {
 		//Log.d("SubPlurkV2", "UserData = " + jsobj.toString());
 		JSONConverter.extractFromJSON(Profile.class, this, jsobj);
+		id = uid;
 	}
 	
 	public int uid;
-	public String nick_name;
-	public String display_name;
-	public int has_profile_image;
-	public int avatar;
 	public String location;
 	public String default_lang;
 	public String date_of_birth;
 	public String full_name;
-	public int gender;
 	public String page_title;
 	public float karma;
 	public int recuited;
 	public String relationship;
-
-	public int hasProfileImage() {
-		return has_profile_image;
-	}
-	@Override
-	public int getUID() {
-		return uid;
-	}
-	@Override
-	public int getAvatar() {
-		return avatar;
-	}
 
 }
